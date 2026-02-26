@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Paws – Dog Adoption Directory</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Georgia', serif; background: #fdf6ee; color: #3d2b1f; }
+  header { background: #6b3f2a; padding: 36px 24px 28px; text-align: center; }
+  header h1 { font-size: 2.6rem; color: #fdf6ee; letter-spacing: 1px; }
+  header p { color: #e8c9a8; margin-top: 8px; font-size: 1.05rem; }
+  .paw { font-size: 1.4rem; }
+  .filters { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; padding: 24px 16px; background: #f3e5d0; border-bottom: 2px solid #e2c9aa; }
+  .filters select, .filters input { padding: 10px 16px; border-radius: 24px; border: 1.5px solid #c49a6c; background: #fff8f0; color: #3d2b1f; font-size: 0.95rem; outline: none; cursor: pointer; }
+  .filters input { min-width: 200px; }
+  .filters input:focus, .filters select:focus { border-color: #6b3f2a; }
+  .stats { text-align: center; padding: 16px; font-size: 0.95rem; color: #7a5540; }
+  .stats span { font-weight: bold; color: #6b3f2a; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px; padding: 16px 32px 48px; max-width: 1200px; margin: 0 auto; }
+  .card { background: #fff8f0; border-radius: 18px; overflow: hidden; box-shadow: 0 3px 14px rgba(107,63,42,0.12); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgba(107,63,42,0.2); }
+  .card-img { width: 100%; height: 240px; object-fit: cover; display: block; }
+  .card-img-placeholder { width: 100%; height: 240px; background: linear-gradient(135deg, #e8c9a8, #c49a6c); display: flex; align-items: center; justify-content: center; font-size: 4rem; }
+  .card-body { padding: 16px 18px 20px; }
+  .card-name { font-size: 1.4rem; font-weight: bold; color: #3d2b1f; margin-bottom: 4px; }
+  .card-color { font-size: 0.9rem; color: #7a5540; margin-bottom: 10px; font-style: italic; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tag { background: #f3e5d0; color: #6b3f2a; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-family: sans-serif; }
+  .tag.gender-m { background: #ddeeff; color: #2a4a6b; }
+  .tag.gender-f { background: #fde8f0; color: #6b2a45; }
+  .status-badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.8rem; font-family: sans-serif; font-weight: bold; }
+  .status-available { background: #d4edda; color: #1a5c2e; }
+  .status-pending   { background: #fff3cd; color: #7a5500; }
+  .status-adopted   { background: #e2e3e5; color: #555; }
+  .card-footer { padding: 0 18px 16px; display: flex; justify-content: space-between; align-items: center; font-family: sans-serif; font-size: 0.82rem; color: #9a7060; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(61,43,31,0.6); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff8f0; border-radius: 20px; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .modal img { width: 100%; height: 300px; object-fit: cover; border-radius: 20px 20px 0 0; display: block; }
+  .modal-img-placeholder { width: 100%; height: 300px; background: linear-gradient(135deg, #e8c9a8, #c49a6c); display: flex; align-items: center; justify-content: center; font-size: 5rem; border-radius: 20px 20px 0 0; }
+  .modal-content { padding: 24px; }
+  .modal-content h2 { font-size: 1.8rem; color: #3d2b1f; }
+  .modal-content .color { color: #7a5540; font-style: italic; margin-bottom: 16px; }
+  .modal-content p { line-height: 1.7; color: #5a3e30; margin-bottom: 16px; font-size: 0.97rem; }
+  .modal-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { padding: 12px 24px; border-radius: 24px; border: none; font-size: 0.95rem; cursor: pointer; font-family: sans-serif; font-weight: bold; transition: opacity 0.2s; }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: #6b3f2a; color: #fff; }
+  .btn-secondary { background: #f3e5d0; color: #6b3f2a; }
+  .close-btn { position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,0.85); border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .empty { text-align: center; padding: 60px 20px; color: #9a7060; font-size: 1.1rem; grid-column: 1/-1; }
+  .empty .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+  footer { text-align: center; padding: 24px; background: #6b3f2a; color: #e8c9a8; font-size: 0.85rem; font-family: sans-serif; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="paw">🐾</span> Find Your Paws</h1>
+  <p>Find your forever friend — rescued dogs looking for loving homes in Bali</p>
+</header>
+
+<div class="filters">
+  <input type="text" id="search" placeholder="🔍 Search by name or color...">
+  <select id="filterStatus">
+    <option value="">All Statuses</option>
+    <option value="Available">Available</option>
+    <option value="Pending">Pending</option>
+    <option value="Adopted">Adopted</option>
+  </select>
+  <select id="filterGender">
+    <option value="">All Genders</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  </select>
+  <select id="filterSize">
+    <option value="">All Sizes</option>
+    <option value="Small">Small</option>
+    <option value="Medium">Medium</option>
+    <option value="Large">Large</option>
+  </select>
+  <select id="filterColor"><option value="">All Colors</option></select>
+  <select id="filterLocation"><option value="">All Locations</option></select>
+</div>
+
+<div class="stats" id="stats"></div>
+<div class="grid" id="grid"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal()">✕</button>
+    <div id="modalInner"></div>
+  </div>
+</div>
+
+<footer>
+  🐾 Find Your Paws &nbsp;·&nbsp; Connecting dogs with loving homes across Bali
+</footer>
+
+<script>
+let dogs = [];
+let filtered = [];
+
+async function loadDogs() {
+  document.getElementById('grid').innerHTML = '<div class="empty"><span class="emoji">🐾</span>Loading dogs...</div>';
+  try {
+    const res = await fetch('/api/dogs');
+    const data = await res.json();
+    dogs = data.records.map(r => ({
+      id:          r.id,
+      name:        r.fields['Name']        || 'Unknown',
+      color:       r.fields['Color']       || '',
+      age:         r.fields['Age']         || '',
+      gender:      r.fields['Gender']      || '',
+      size:        r.fields['Size']        || '',
+      shelter:     r.fields['Shelter']     || '',
+      location:    r.fields['Location']    || '',
+      description: r.fields['Description'] || '',
+      status:      r.fields['Status']      || 'Available',
+      link:        r.fields['Social Link'] || '',
+      photo:       r.fields['Photo'] ? r.fields['Photo'][0].url : '',
+    }));
+    filtered = [...dogs];
+    populateFilters();
+    renderCards();
+  } catch(e) {
+    document.getElementById('grid').innerHTML = '<div class="empty"><span class="emoji">😕</span>Could not load dogs. Please try again later.</div>';
+  }
+}
+
+function populateFilters() {
+  const colorSel = document.getElementById('filterColor');
+  colorSel.innerHTML = '<option value="">All Colors</option>';
+  [...new Set(dogs.map(d => d.color).filter(Boolean))].sort()
+    .forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; colorSel.appendChild(o); });
+
+  const locSel = document.getElementById('filterLocation');
+  locSel.innerHTML = '<option value="">All Locations</option>';
+  [...new Set(dogs.map(d => d.location).filter(Boolean))].sort()
+    .forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; locSel.appendChild(o); });
+}
+
+function statusClass(s) { return 'status-' + s.toLowerCase(); }
+
+function renderCards() {
+  const grid = document.getElementById('grid');
+  const stats = document.getElementById('stats');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty"><span class="emoji">🐾</span>No dogs found matching your search.</div>';
+    stats.innerHTML = '';
+    return;
+  }
+  const avail = filtered.filter(d => d.status === 'Available').length;
+  stats.innerHTML = `Showing <span>${filtered.length}</span> dogs &nbsp;·&nbsp; <span>${avail}</span> available for adoption`;
+  grid.innerHTML = filtered.map(dog => `
+    <div class="card" onclick="openModal('${dog.id}')">
+      ${dog.photo ? `<img class="card-img" src="${dog.photo}" alt="${dog.name}" loading="lazy">` : `<div class="card-img-placeholder">🐶</div>`}
+      <div class="card-body">
+        <div class="card-name">${dog.name}</div>
+        <div class="card-color">${dog.color}</div>
+        <div class="tags">
+          <span class="tag">${dog.age}</span>
+          <span class="tag gender-${dog.gender==='Male'?'m':'f'}">${dog.gender}</span>
+          <span class="tag">${dog.size}</span>
+        </div>
+        <span class="status-badge ${statusClass(dog.status)}">${dog.status}</span>
+      </div>
+      <div class="card-footer">
+        <span>📍 ${dog.location}</span>
+        <span>${dog.shelter}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(id) {
+  const dog = dogs.find(d => d.id === id);
+  if (!dog) return;
+  document.getElementById('modalInner').innerHTML = `
+    ${dog.photo ? `<img src="${dog.photo}" alt="${dog.name}">` : `<div class="modal-img-placeholder">🐶</div>`}
+    <div class="modal-content">
+      <h2>${dog.name}</h2>
+      <div class="color">${dog.color}</div>
+      <div class="modal-tags">
+        <span class="tag">${dog.age}</span>
+        <span class="tag gender-${dog.gender==='Male'?'m':'f'}">${dog.gender}</span>
+        <span class="tag">${dog.size}</span>
+        <span class="tag">📍 ${dog.location}</span>
+        <span class="status-badge ${statusClass(dog.status)}">${dog.status}</span>
+      </div>
+      <p>${dog.description}</p>
+      <p style="font-size:0.88rem;color:#9a7060">Shelter: <strong>${dog.shelter}</strong></p>
+      <div class="modal-actions">
+        ${dog.status !== 'Adopted' && dog.link ? `<a href="${dog.link}" target="_blank"><button class="btn btn-primary">🐾 Enquire About ${dog.name}</button></a>` : ''}
+        <button class="btn btn-secondary" onclick="closeModal()">Back to listings</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+});
+
+function applyFilters() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const status = document.getElementById('filterStatus').value;
+  const gender = document.getElementById('filterGender').value;
+  const size = document.getElementById('filterSize').value;
+  const color = document.getElementById('filterColor').value;
+  const loc = document.getElementById('filterLocation').value;
+  filtered = dogs.filter(d =>
+    (!q || d.name.toLowerCase().includes(q) || d.color.toLowerCase().includes(q)) &&
+    (!status || d.status === status) &&
+    (!gender || d.gender === gender) &&
+    (!size || d.size === size) &&
+    (!color || d.color === color) &&
+    (!loc || d.location === loc)
+  );
+  renderCards();
+}
+
+['search','filterStatus','filterGender','filterSize','filterColor','filterLocation']
+  .forEach(id => document.getElementById(id).addEventListener('input', applyFilters));
+
+loadDogs();
+</script>
+</body>
+</html>
