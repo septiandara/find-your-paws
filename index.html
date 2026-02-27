@@ -111,10 +111,6 @@
 <div class="stats" id="stats"></div>
 <div class="grid" id="grid"></div>
 
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img id="lightboxImg" src="" alt="">
-</div>
 
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modal" style="position:relative">
@@ -203,18 +199,12 @@ function renderCards() {
   `).join('');
 }
 
-function openLightbox(url, name) {
-  document.getElementById('lightboxImg').src = url;
-  document.getElementById('lightboxImg').alt = name;
-  document.getElementById('lightbox').classList.add('open');
-}
-function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 
 function openModal(id) {
   const dog = dogs.find(d => d.id === id);
   if (!dog) return;
   document.getElementById('modalInner').innerHTML = `
-    ${dog.photo ? `<img src="${dog.photo}" alt="${dog.name}" onclick="openLightbox('${dog.photo}', '${dog.name}')" style="cursor:zoom-in" title="Click to enlarge">` : `<div class="modal-img-placeholder">🐶</div>`}
+    ${dog.photo ? `<img src="${dog.photo}" alt="${dog.name}">` : `<div class="modal-img-placeholder">🐶</div>`}
     <div class="modal-content">
       <h2>${dog.name}</h2>
       <div class="color">${dog.color}</div>
