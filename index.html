@@ -4,14 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Find Your Paws – Dog Adoption Directory</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Georgia', serif; background: #fdf6ee; color: #3d2b1f; }
-  header { background: #6b3f2a; padding: 36px 24px 28px; text-align: center; }
-  header h1 { font-size: 2.6rem; color: #fdf6ee; letter-spacing: 1px; font-family: 'Playfair Display', Georgia, serif; }
-  header p { color: #e8c9a8; margin-top: 8px; font-size: 1.05rem; }
-  .paw { font-size: 1.4rem; }
+  body { font-family: 'Nunito', sans-serif; background: #fdf6ee; color: #3d2b1f; }
+  header { background: #6b3f2a; padding: 40px 24px 36px; text-align: center; position: relative; overflow: hidden; }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, #8B5235 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, #5a3020 0%, transparent 60%); }
+  .header-inner { position: relative; z-index: 1; }
+  .header-logo { display: inline-block; margin-bottom: 12px; }
+  header h1 { font-family: 'Fredoka', sans-serif; font-size: 3.2rem; color: #fdf6ee; letter-spacing: 2px; font-weight: 700; line-height: 1; text-shadow: 3px 3px 0px rgba(0,0,0,0.15); }
+  header h1 .find { color: #f0c070; display: block; font-size: 1.4rem; letter-spacing: 6px; text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
+  header h1 .your { color: #fdf6ee; }
+  header h1 .paws { color: #f0c070; position: relative; }
+  header p { color: #e8c9a8; margin-top: 10px; font-size: 1rem; font-family: 'Nunito', sans-serif; letter-spacing: 0.5px; }
   .filters { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; padding: 24px 16px; background: #f3e5d0; border-bottom: 2px solid #e2c9aa; }
   .filters select, .filters input { padding: 10px 16px; border-radius: 24px; border: 1.5px solid #c49a6c; background: #fff8f0; color: #3d2b1f; font-size: 0.95rem; outline: none; cursor: pointer; }
   .filters input { min-width: 200px; }
@@ -59,8 +64,25 @@
 <body>
 
 <header>
-  <h1><span class="paw">🐾</span> Find Your Paws</h1>
-  <p>Find your forever friend — rescued dogs looking for loving homes in Bali</p>
+  <div class="header-inner">
+    <!-- SVG decorative header -->
+    <svg class="header-logo" width="320" height="90" viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Paw prints scattered -->
+      <text x="18" y="30" font-size="22" opacity="0.25" fill="#f0c070">🐾</text>
+      <text x="270" y="28" font-size="18" opacity="0.2" fill="#f0c070">🐾</text>
+      <text x="290" y="72" font-size="14" opacity="0.15" fill="#f0c070">🐾</text>
+      <text x="8" y="76" font-size="14" opacity="0.15" fill="#f0c070">🐾</text>
+      <!-- Wavy underline -->
+      <path d="M60 78 Q100 70 160 76 Q220 82 260 74" stroke="#f0c070" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.5"/>
+      <!-- Star accents -->
+      <text x="44" y="52" font-size="14" fill="#f0c070" opacity="0.5">✦</text>
+      <text x="264" y="54" font-size="14" fill="#f0c070" opacity="0.5">✦</text>
+      <!-- Main title text -->
+      <text x="160" y="44" font-family="Fredoka, sans-serif" font-size="20" font-weight="600" fill="#f0c070" text-anchor="middle" letter-spacing="8" opacity="0.9">FIND YOUR</text>
+      <text x="160" y="76" font-family="Fredoka, sans-serif" font-size="42" font-weight="700" fill="#fdf6ee" text-anchor="middle" letter-spacing="3">PAWS 🐾</text>
+    </svg>
+    <p>Rescued dogs looking for loving homes in Bali</p>
+  </div>
 </header>
 
 <div class="filters">
@@ -162,7 +184,7 @@ function renderCards() {
   stats.innerHTML = `Showing <span>${filtered.length}</span> dogs &nbsp;·&nbsp; <span>${avail}</span> available for adoption`;
   grid.innerHTML = filtered.map(dog => `
     <div class="card" onclick="openModal('${dog.id}')">
-      ${dog.photo ? `<img class="card-img" src="${dog.photo}" alt="${dog.name}" loading="lazy" onclick="event.stopPropagation(); openLightbox('${dog.photo}', '${dog.name}')" style="cursor:zoom-in">` : `<div class="card-img-placeholder">🐶</div>`}
+      ${dog.photo ? `<img class="card-img" src="${dog.photo}" alt="${dog.name}" loading="lazy">` : `<div class="card-img-placeholder">🐶</div>`}
       <div class="card-body">
         <div class="card-name">${dog.name}</div>
         <div class="card-color">${dog.color}</div>
@@ -192,7 +214,7 @@ function openModal(id) {
   const dog = dogs.find(d => d.id === id);
   if (!dog) return;
   document.getElementById('modalInner').innerHTML = `
-    ${dog.photo ? `<img src="${dog.photo}" alt="${dog.name}" onclick="openLightbox('${dog.photo}', '${dog.name}')" style="cursor:zoom-in">` : `<div class="modal-img-placeholder">🐶</div>`}
+    ${dog.photo ? `<img src="${dog.photo}" alt="${dog.name}" onclick="openLightbox('${dog.photo}', '${dog.name}')" style="cursor:zoom-in" title="Click to enlarge">` : `<div class="modal-img-placeholder">🐶</div>`}
     <div class="modal-content">
       <h2>${dog.name}</h2>
       <div class="color">${dog.color}</div>
